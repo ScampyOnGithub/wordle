@@ -2,18 +2,18 @@ from english_words import get_english_words_set
 import random
 
 GUESSES_PER_GAME: int = 6
-
-RED     =   "\033[1;31m"
-YELLOW  =   "\033[1;33m"
-GREEN   =   "\033[1;32m"
+RED     =   "\033[1;31m"    # For guessed letters that do not occur in the word
+YELLOW  =   "\033[1;33m"    # For guessed letters that occur in the word, but are in the wrong place
+GREEN   =   "\033[1;32m"    # For guessed letters that are in the correct place
 OFF     =   "\033[0;0m "
 
-def rchop(s, suffix):
+def rchop(s: str, suffix: str) -> str:
     if suffix and s.endswith(suffix):
         return s[:-len(suffix)]
     return s
 
-def createListOfNLetterWords(n) -> list:
+
+def createListOfNLetterWords(n: int=5) -> list:
     if n == 5:
         with open("guesses.txt", "r") as guesses:
             validGuesses = [rchop(line, "\n") for line in guesses]
@@ -26,12 +26,11 @@ def createListOfNLetterWords(n) -> list:
     return [word for word in list(web2lowerset) if len(word) == n], [word for word in list(web2lowerset) if len(word) == n]
 
 
-
 def compareGuessToWord(guessedWord, correctWord) -> str:
     listOfLetters: list[str] = []
     lettersInCorrectPlace: list[str] = []
 
-    # checks for letters in the correct location
+    # checks for any letters in the correct locations
     for i in range(0, len(correctWord)):
 
         if guessedWord.lower()[i] == correctWord.lower()[i]:
@@ -51,12 +50,13 @@ def compareGuessToWord(guessedWord, correctWord) -> str:
 
         else:
             listOfLetters.append(f"{RED}{guessedWord.upper()[i]}{OFF}")
-        
-    return "".join(listOfLetters)
+
+    print("".join(listOfLetters))
+    return guessedWord.upper() == correctWord.upper()
+    
             
 
 def main() -> None:
-    
     numberOfLetters: int = 0
     while numberOfLetters == 0:
         try:
@@ -71,21 +71,21 @@ def main() -> None:
 
     
     guessesRemaining: int = GUESSES_PER_GAME
-    guesses: list[str] = []
 
-    while guessesRemaining >= 0:
-        #print(f"{guess}\n" for guess in guesses)
-        nextGuess = ""
+    while guessesRemaining > 0:
+        nextGuess: str = ""
         while len(nextGuess) != numberOfLetters or nextGuess not in createListOfNLetterWords(n=numberOfLetters)[0]:
-            nextGuess = input()
+            nextGuess = input(f"Guess #{GUESSES_PER_GAME - guessesRemaining + 1}: ")
             if len(nextGuess) != numberOfLetters:
                 print(f"Your guess is too short/long! You need to guess a {numberOfLetters}-letter word!")
             elif nextGuess not in createListOfNLetterWords(n=numberOfLetters)[0]:
                 print(f"That is not a valid word. Please try again.")
 
         guessesRemaining -= 1
-        guesses.append(compareGuessToWord(guessedWord=nextGuess, correctWord=wordToGuess))
-        print(compareGuessToWord(guessedWord=nextGuess, correctWord=wordToGuess))
+
+        if compareGuessToWord(guessedWord=nextGuess, correctWord=wordToGuess):
+            print("Congratulations, you guessed the word correctly!")
+            break
         
 
 if __name__ == "__main__":
