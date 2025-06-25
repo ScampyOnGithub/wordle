@@ -16,9 +16,9 @@ def rchop(s: str, suffix: str) -> str:
 def createListOfNLetterWords(n: int=5) -> list:
     if n == 5:
         with open("guesses.txt", "r") as guesses:
-            validGuesses = [rchop(line, "\n") for line in guesses]
+            validGuesses: list[str] = [rchop(line, "\n") for line in guesses]
         with open("answers.txt", "r") as answers:
-            validAnswers = [rchop(line, "\n") for line in answers]
+            validAnswers: list[str] = [rchop(line, "\n") for line in answers]
 
         return validGuesses, validAnswers
 
